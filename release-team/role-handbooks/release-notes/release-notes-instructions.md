@@ -115,14 +115,18 @@ Usage:
   krel release-notes [flags]
 
 Flags:
-      --create-draft-pr               create the Release Notes Draft PR. --draft-org and --draft-repo must be set along with this option
-      --draft-org string              a Github organization owner of the fork of k/sig-release where the Release Notes Draft PR will be created
-      --draft-repo string             the name of the fork of k/sig-release, the Release Notes Draft PR will be created from this repository (default "sig-release")
-      --format string                 The format for notes output (options: markdown, json) (default "markdown")
-  -h, --help                          help for release-notes
-  -o, --output-dir string             output a copy of the release notes to this directory (default ".")
-      --sigrelease-fork-path string   output a copy of the release notes to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigrelease")
-  -t, --tag string                    version tag for the notes
+      --create-draft-pr                    create the Release Notes Draft PR. --draft-org and --draft-repo must be set along with this option
+      --create-website-pr                  generate the Releas Notes to a local fork of relnotes.k8s.io and create a PR.  --draft-org and --draft-repo must be set along with this option
+      --draft-org string                   a Github organization owner of the fork of k/sig-release where the Release Notes Draft PR will be created
+      --draft-repo string                  the name of the fork of k/sig-release, the Release Notes Draft PR will be created from this repository (default "sig-release")
+      --format string                      The format for notes output (options: markdown, json) (default "markdown")
+  -h, --help                               help for release-notes
+      --kubernetes-sigs-fork-path string   fork kubernetes-sigs/release-notes and output a copy of the json release notes to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigs")
+  -o, --output-dir string                  output a copy of the release notes to this directory (default ".")
+      --sigrelease-fork-path string        fork k/sig-release and output a copy of the release notes draft to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigrelease")
+  -t, --tag string                         version tag for the notes
+      --website-org string                 a Github organization owner of the fork of kuberntets-sigs/release-notes where the Website PR will be created
+      --website-repo string                the name of the fork of kuberntets-sigs/release-notes, the Release Notes Draft PR will be created from this repository (default "release-notes")
 
 Global Flags:
       --cleanup            cleanup flag
@@ -183,14 +187,18 @@ Usage:
   krel release-notes [flags]
 
 Flags:
-      --create-draft-pr               create the Release Notes Draft PR. --draft-org and --draft-repo must be set along with this option
-      --draft-org string              a Github organization owner of the fork of k/sig-release where the Release Notes Draft PR will be created
-      --draft-repo string             the name of the fork of k/sig-release, the Release Notes Draft PR will be created from this repository (default "sig-release")
-      --format string                 The format for notes output (options: markdown, json) (default "markdown")
-  -h, --help                          help for release-notes
-  -o, --output-dir string             output a copy of the release notes to this directory (default ".")
-      --sigrelease-fork-path string   output a copy of the release notes to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigrelease")
-  -t, --tag string                    version tag for the notes
+      --create-draft-pr                    create the Release Notes Draft PR. --draft-org and --draft-repo must be set along with this option
+      --create-website-pr                  generate the Releas Notes to a local fork of relnotes.k8s.io and create a PR.  --draft-org and --draft-repo must be set along with this option
+      --draft-org string                   a Github organization owner of the fork of k/sig-release where the Release Notes Draft PR will be created
+      --draft-repo string                  the name of the fork of k/sig-release, the Release Notes Draft PR will be created from this repository (default "sig-release")
+      --format string                      The format for notes output (options: markdown, json) (default "markdown")
+  -h, --help                               help for release-notes
+      --kubernetes-sigs-fork-path string   fork kubernetes-sigs/release-notes and output a copy of the json release notes to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigs")
+  -o, --output-dir string                  output a copy of the release notes to this directory (default ".")
+      --sigrelease-fork-path string        fork k/sig-release and output a copy of the release notes draft to this directory (default "/var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigrelease")
+  -t, --tag string                         version tag for the notes
+      --website-org string                 a Github organization owner of the fork of kuberntets-sigs/release-notes where the Website PR will be created
+      --website-repo string                the name of the fork of kuberntets-sigs/release-notes, the Release Notes Draft PR will be created from this repository (default "release-notes")
 
 Global Flags:
       --cleanup            cleanup flag
@@ -486,23 +494,14 @@ Already up to date.
 user@laptop:~/release-notes$
 ```
 
-7. Create a new branch for the release notes patch:
-```
-user@laptop:~/release-notes$ git checkout -b 'v1.18.0-rc.1_release_notes_patch'
-
-Switched to a new branch 'v1.18.0-rc.1_release_notes_patch'
-
-user@laptop:~/release-notes$
-```
-
-8. Generate Release Notes Patch in JSON with the `krel release-notes` with the `--create-website-pr` option.
+7. Generate Release Notes Patch in JSON with the `krel release-notes` with the `--create-website-pr` option.
 You must supply the following options:
 - `--tag` which is the Kubernetes release version e.g. v1.18.0-rc.1
 - `--website-org` which is your GitHub account
 - `--website-repo=release-notes`
 
 >N.B. `krel release-notes --create-website-pr` will do the following:
-> - create a branch in your cloned fork of `kubernetes-sigs/release-notes`
+> - create a branch in your cloned fork of `kubernetes-sigs/release-notes` called `release-notes-json-<version>` e.g. `release-notes-json-v1.18.0-rc.1`
 > - generate the JSON file for the Release Notes Website in kubernetes-sigs/release-notes/src/assets/<release
 > version>.json (e.g. release-notes-1.18.0-rc.1.json)
 > - update the `assets` list with the release version in kubernetes-sigs/release-notes/src/environments/assets.ts
@@ -516,28 +515,27 @@ user@laptop:~/release-notes$ $GOPATH/bin/krel release-notes \
   --website-org=reylejano-rxm \
   --website-repo=release-notes
 
+INFO Generating release notes for tag v1.18.0-rc.1
 INFO cloning/updating repository kubernetes/kubernetes
-INFO using found start SHA: b7dcc4ac29812042769148679de1fbf54580ac7e
-INFO using found end SHA: f2d7577e31829664899f1b8e3d3a73de8c5f4029
-INFO fetching all commits. This might take a while...
-INFO starting to process commit 1 of 243 (0.41%): 5cc572f798a840030a20b80761214d675a4a9386
-INFO starting to process commit 2 of 243 (0.82%): 6ec3ea855d22b30d8b8cef5657bb6ec78f4dfd7b
+INFO using found start SHA: 49dfa8690488c6658b3e334dd3737c7eb465c639
+INFO using found end SHA: dbbed7806681109f541264ab37284f9a51c87fcc
+INFO Using start tag v1.18.0-beta.2               
+INFO Using end tag v1.18.0-rc.1                   
+INFO starting to process commit 1 of 70 (1.43%): adf4ccab61d4fecd4af3ba12d5e4f1fb3ae58c96
+INFO starting to process commit 2 of 70 (2.86%): dd9474e78ebc3f10caf8d2ea3a9bccc7cb8736ec
 ...
-IINFO starting to process commit 241 of 243 (99.18%): 7c12251c7a6e88929db97c28199febdf467c384e
-INFO starting to process commit 242 of 243 (99.59%): 8e9d76f1b95be03e213f99509d052c7dcd58f492
-INFO starting to process commit 243 of 243 (100.00%): ddc18eae67cc7973679c1c46bfb2a217148edda0
-ERRO getting the release note from commit 3631887a284e550a23aa16ebe6095e4b9427b673 (PR #87215): no matches found when parsing note text from commit string
+INFO Verifying release-notes-json-v1.18.0-rc.1 branch exists on the remote
+INFO Writing json reference to release-notes-1.18.0-rc.1.json in /var/folders/35/m9zql4dj7t3_bq6qsq567vqc0000gn/T/k8s-sigs/src/environments/assets.ts
 INFO got the commits, performing rendering
 INFO release notes written to file                 format=json path=src/assets/release-notes-1.18.0-rc.1.json
 
 user@laptop:~/release-notes$
 ```
 
-9. Verify the generated patch release notes is saved in `src/assets`
+8. Verify the generated patch release notes is saved in `src/assets`
 e.g. `src/assets/release-notes-1.18.0-rc.1.json`
 
-
-10. Verify the `assets` list in `src/environments/assets.ts` was updated with the new version to the [0] index position of the list e.g. `assets/release-notes`:
+9. Verify the `assets` list in `src/environments/assets.ts` was updated with the new version to the [0] index position of the list e.g. `assets/release-notes`:
 
 e.g.
 ```
@@ -546,7 +544,7 @@ export const assets = [
   'assets/release-notes-1.18.0-beta.2.json',
 ```
 
-11. Create a Pull Request.
+10. Create a Pull Request.
 Go to your release-notes fork and branch for the patch to create the Pull Request:
 
 Edit the Title, add the commands used in the Description, and cc appropriate people like the team lead and team members:
@@ -567,7 +565,7 @@ krel release-notes \
 cc/ @saschagrunert @evillgenius75 @puerco @JamesLaverack
 ```
 
-12. Pay attention to the Prow comments to assign the appropriate Assignee(s).
+11. Pay attention to the Prow comments to assign the appropriate Assignee(s).
 
-13. Delete your fork when the Pull Request has merged.
+12. Delete your fork when the Pull Request has merged.
 
